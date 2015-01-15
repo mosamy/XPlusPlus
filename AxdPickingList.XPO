@@ -1,0 +1,635 @@
+Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: AxdPickingList unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxdPickingList
+    Id 2992
+    PROPERTIES
+      Name                #AxdPickingList
+      Extends             #AxdBase
+      RunOn               #Server
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #/// <summary>
+        #///    The <c>AxdPickingList</c> class is used for sending picking list information from Microsoft Dynamics AX to External 3rd party system.
+        #/// </summary>
+        #class AxdPickingList extends AxdBase
+        #{
+        #    AifConstraintList   aifConstraintList;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #create
+        #/// <summary>
+        #///    Throws an error since this document class does not support inbound data import.
+        #/// </summary>
+        #/// <param name="_xml">
+        #///    An XML string that contains the data (transaction) to be persisted to the Microsoft Dynamics AX database.
+        #/// </param>
+        #/// <param name="_actionPolicyInfo">
+        #///    The <c>recId</c> of the map policy that specifies what value mapping to perform.
+        #/// </param>
+        #/// <param name="_constraintList">
+        #///    The default value of the enum describing the type of document.
+        #/// </param>
+        #/// <returns>
+        #///    The entity key that defines the created transaction.
+        #/// </returns>
+        #/// <remarks>
+        #///    Documents are always created and never updated.
+        #///    The method is callable on the <c>AxdBase</c> class. If a document should not be inbound, the <c>create</c> method must be overridden to throw an
+        #///    error if called.
+        #/// </remarks>
+        #public AifEntityKey create(XML                         _xml,
+        #                           AifEndpointActionPolicyInfo _actionPolicyInfo,
+        #                           AifConstraintList           _constraintList)
+        #{
+        #    throw error(strfmt("@SYS94924", this.getName(), "@SYS91302"));
+        #}
+        #
+      ENDSOURCE
+      SOURCE #createList
+        #/// <summary>
+        #///    Throws an error since this document class does not support inbound data import.
+        #/// </summary>
+        #/// <param name="_xml">
+        #///    An XML string that contains the data (transaction) to be persisted to the Microsoft Dynamics AX database.
+        #/// </param>
+        #/// <param name="_actionPolicyInfo">
+        #///    The <c>recId</c> of the map policy that specifies what value mapping to perform.
+        #/// </param>
+        #/// <param name="_constraintListCollection">
+        #///    A collection of lists that contain the constraints that are identified for each document.
+        #///    The <paramref name="_constraintListCollection" /> parameter must be an instantiated, empty <see
+        #///    cref="AifConstraintListCollection Class" />. It will be populated when the <c>createList</c> method is run.
+        #/// </param>
+        #/// <returns>
+        #///    A list that contains the entity keys that define each of the created transactions.
+        #/// </returns>
+        #/// <remarks>
+        #///    The method is callable on the <c>AxdBase</c> class. If a document does not provide the corresponding action type (ReceiveDocumentList), the <c>createList</c> method must be overridden to throw an
+        #///    error if called.
+        #/// </remarks>
+        #public AifEntityKeyList createList(XML                         _xml,
+        #                                   AifEndpointActionPolicyInfo _actionPolicyInfo,
+        #                                   AifConstraintListCollection _constraintListCollection)
+        #{
+        #    throw error(strfmt("@SYS94924", this.getName(), "@SYS94110"));
+        #}
+        #
+      ENDSOURCE
+      SOURCE #CubesRegisterPickingList
+        #boolean CubesRegisterPickingList(str 20 ItemID, str 20 RouteID, real qty)
+        #{
+        #
+        #//
+        #   boolean retval = true;
+        #   List list = new List(Types::String);
+        #  WMSOrderTrans WOTTable;
+        #    WMSPickingRoute localWMSPickingRoute;
+        #    //str 20 RouteID;
+        #   // str 20 ItemID;
+        #    real Quantity;
+        #    ;
+        #   // RouteID = 'IRT474020';
+        #    //Quantity =1;
+        #    //ItemID =  '10000001';
+        #
+        #
+        # //'10000001'
+        # //str 20 ItemID;
+        #//str 20 ItemID2;
+        #//WMSOrderTrans WOTTable;
+        #try
+        #{
+        #while select forupdate WOTTable
+        # where WOTTable.itemId == ItemID && WOTTable.routeId == RouteID// 'IRT473999'
+        #
+        #{
+        # if (WOTTable)
+        # {
+        # ttsbegin;
+        # //WOTTable.itemId = '10000001' ;
+        #  //WOTTable.routeId = RouteID;
+        #  WOTTable.qty = qty;
+        # // WOTTable.expeditionStatus = 10;
+        # // WOTTAble.expeditionStatus = WMSExpeditionStatus::Complete;
+        #  //WOTTable.Insert();
+        # ttscommit;
+        #  }
+        #
+        #    list.addEnd(RouteID);
+        #
+        #    WMSPickingRoute::finishMulti(list.pack());//Note - this is not in a single tts, so some routes migh
+        #    wmsDeliverPickedItems::checkDeliverPickedItems(localWMSPickingRoute.PickingRouteID,List.pack());
+        #
+        #}
+        #return true;
+        #}
+        #catch (Exception::Error)
+        #{
+        #return false;
+        #}
+        #
+        #
+        #
+        #
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #CubesRegisterPickingListValidation
+        #str 50 CubesRegisterPickingListValidation(str 20 ItemID, str 20 RouteID, real qty)
+        #{
+        #
+        #//
+        #   boolean retval = true;
+        #   List list = new List(Types::String);
+        #  WMSOrderTrans WOTTable;
+        #  WMSOrder WOTable;
+        #    WMSPickingRoute localWMSPickingRoute;
+        #    RouteTable RT;
+        #    //str 20 RouteID;
+        #   // str 20 ItemID;
+        #    real Quantity;
+        #    str s1;
+        #    str sqty;
+        #    str rqty;
+        #    ;
+        #
+        #
+        #
+        #
+        #try
+        #{
+        #while select forupdate WOTTable
+        # where WOTTable.itemId == ItemID && WOTTable.routeId == RouteID// 'IRT473999'
+        #
+        #{
+        # if (WOTTable)
+        # {
+        # ttsbegin;
+        #
+        #  WOTTable.qty = qty;
+        #
+        # ttscommit;
+        #  }
+        #  else
+        #  {
+        #  return "item does not exist";
+        #  }
+        #
+        #  // update the localWMStable
+        #  while select forupdate WOTable
+        # where WOTable.itemId == ItemID && WOTable.inventTransId == WOTTable.inventTransId// 'IRT473999'
+        #
+        #{
+        # if (WOTable)
+        # {
+        # ttsbegin;
+        # if (WOTable.qty < qty)
+        # {
+        #  sqty = num2Str(Qty,0,4,1,3);
+        #  rqty = num2Str(WOTable.qty,0,4,1,3);
+        # // WOTable.qtyRegistered(qty, );
+        # return "Quantity out of range you requested " + sqty + " but only " + rqty + " exists";
+        # }
+        # else
+        # {
+        #
+        #  WOTable.qtyRequested = qty;
+        # }
+        # ttscommit;
+        #
+        #  }
+        #  else
+        #  {
+        #  return "item does not exist";
+        #  }
+        #
+        #
+        #
+        #
+        #
+        #  }
+        #
+        #
+        #
+        #    list.addEnd(RouteID);
+        #
+        #    WMSPickingRoute::finishMulti(list.pack());//Note - this is not in a single tts, so some routes migh
+        #    wmsDeliverPickedItems::checkDeliverPickedItems(localWMSPickingRoute.PickingRouteID,List.pack());
+        #
+        #}
+        #
+        #
+        #s1 = num2Str(Qty,0,4,1,3);
+        #return "Registration successfulQTY is  " + s1;
+        #}
+        #catch (Exception::Error)
+        #{
+        #return"Error occured trying to register";
+        #}
+        #
+        #
+        #
+        #
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #deleteList
+        #/// <summary>
+        #///    Throws an error since this document class does not support the action.
+        #/// </summary>
+        #/// <param name="_aifEntityKeyList">
+        #///    A list of entity keys that identify the transactions to be delete.
+        #/// </param>
+        #/// <param name="_actionPolicyInfo">
+        #///    The <c>recId</c> of the map policy that specifies what value mapping to perform.
+        #/// </param>
+        #/// <param name="_constraintListCollection">
+        #///    A collection of lists that contain the constraints that are identified for each document.
+        #///    The <paramref name="_constraintListCollection" /> parameter must be an instantiated, empty <see
+        #///    cref="AifConstraintListCollection Class" />. It will be populated when the <c>readList</c> method is run.
+        #/// </param>
+        #/// <returns>
+        #///    The entity key that defines the deleted transaction.
+        #/// </returns>
+        #/// <remarks>
+        #///    Documents are always deleted and never created.
+        #///    The method is callable on the <c>AxdBase</c> class. If a document does not provide the corresponding action type <c>delete</c>
+        #///    method must be overridden on the document class for the <c>delete</c> method to throw an error if called.
+        #/// </remarks>
+        #public AifResult deleteList(AifEntityKeyList            _aifEntityKeyList,
+        #                            AifEndpointActionPolicyInfo _actionPolicyInfo,
+        #                            AifConstraintListCollection _constraintListCollection)
+        #{
+        #    throw error(strfmt("@SYS94924", this.getName(), "@SYS104091"));
+        #}
+        #
+      ENDSOURCE
+      SOURCE #getActionList
+        #/// <summary>
+        #///    Gets a list of all possible actions for the AxdPickingList object.
+        #/// </summary>
+        #/// <returns>
+        #///    A list of <c>AifActionInfo</c> objects representing all possible actions.
+        #/// </returns>
+        #/// <remarks>
+        #///    For <c>AxdPickingList</c>, the possible action is QueryDocuments.
+        #/// </remarks>
+        #public AifActionInfoList getActionList()
+        #{
+        #    AifActionInfoList   actions = new AifActionInfoList();
+        #    AifActionInfo       aifActionInfo;
+        #    ;
+        #
+        #    //read
+        #    aifActionInfo = new AifActionInfo();
+        #    aifActionInfo.parmActionId(strfmt('%1%2', methodstr(AxdBase, read), this.getName()));
+        #    aifActionInfo.parmActionType(AifActionType::SendDocument);
+        #    aifActionInfo.parmExternalName(aifActionInfo.parmActionId());
+        #    aifActionInfo.parmMethodName(methodstr(AxdBase, read));
+        #    aifActionInfo.parmLabel("@SYS121995");
+        #    aifActionInfo.parmDescription("@SYS121996");
+        #    aifActionInfo.parmDisplayMenuItemName(menuitemdisplaystr(AifDocConfiguration));
+        #
+        #    actions.add(aifActionInfo);
+        #
+        #    //readList
+        #    aifActionInfo = new AifActionInfo();
+        #    aifActionInfo.parmActionId(strfmt('%1%2', methodstr(AxdBase, readList), this.getName()));
+        #    aifActionInfo.parmActionType(AifActionType::SendDocumentList);
+        #    aifActionInfo.parmExternalName(aifActionInfo.parmActionId());
+        #    aifActionInfo.parmMethodName(methodstr(AxdBase, readList));
+        #    aifActionInfo.parmLabel("@SYS121997");
+        #    aifActionInfo.parmDescription("@SYS121998");
+        #    aifActionInfo.parmDisplayMenuItemName(menuitemdisplaystr(AifDocConfiguration));
+        #
+        #    actions.add(aifActionInfo);
+        #
+        #    //findList
+        #    aifActionInfo = new AifActionInfo();
+        #    aifActionInfo.parmActionId(strfmt('%1%2', methodstr(AxdBase, findList), this.getName()));
+        #    aifActionInfo.parmActionType(AifActionType::QueryDocuments);
+        #    aifActionInfo.parmExternalName(aifActionInfo.parmActionId());
+        #    aifActionInfo.parmMethodName(methodstr(AxdBase, findList));
+        #    aifActionInfo.parmLabel("@SYS121999");
+        #    aifActionInfo.parmDescription("@SYS122000");
+        #    aifActionInfo.parmDisplayMenuItemName(menuitemdisplaystr(AifDocConfiguration));
+        #
+        #    actions.add(aifActionInfo);
+        #
+        #    //findEntityKeyList
+        #    aifActionInfo = new AifActionInfo();
+        #    aifActionInfo.parmActionId(strfmt('%1%2', methodstr(AxdBase, findEntityKeyList), this.getName()));
+        #    aifActionInfo.parmActionType(AifActionType::QueryEntityKeys);
+        #    aifActionInfo.parmExternalName(aifActionInfo.parmActionId());
+        #    aifActionInfo.parmMethodName(methodstr(AxdBase, findEntityKeyList));
+        #    aifActionInfo.parmLabel("@SYS122001");
+        #    aifActionInfo.parmDescription("@SYS122002");
+        #    aifActionInfo.parmDisplayMenuItemName(menuitemdisplaystr(AifDocConfiguration));
+        #
+        #    actions.add(aifActionInfo);
+        #
+        #    return actions;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #getConstraintList
+        #/// <summary>
+        #///    Identifies the constraint(s) from a particular record.
+        #/// </summary>
+        #/// <param name="_curRec">
+        #///    The current record from which the constraint(s) should be found.
+        #/// </param>
+        #/// <param name="_constraintList">
+        #///    A list that contains the constraints that are identified by means of the <c>getConstraintList</c> method.
+        #///    The <paramref name="_constrainList" /> parameter is populated by running the method.
+        #/// </param>
+        #/// <remarks>
+        #///    The <c>getConstraintList</c> method is an abstract on the <c>AxdBase</c> class, and must be implemented by all derived classes.
+        #///    The method is intended only to be used internally, and should not be called through the interface.
+        #/// </remarks>
+        #public void getConstraintList(Common _curRec, AifConstraintList _constraintList)
+        #{
+        #    int     i ;
+        #    int     noOfConstraints ;
+        #    ;
+        #
+        #    noOfConstraints = aifConstraintList.getConstraintCount() ;
+        #    for(i=1 ;i <= noOfConstraints; i++)
+        #    {
+        #           _constraintList.addConstraint(aifConstraintList.getConstraint(i)) ;
+        #    }
+        #}
+        #
+        #
+        #
+        #
+        #
+      ENDSOURCE
+      SOURCE #GetLabel
+        #/// <summary>
+        #///    Returns the label corresponding to the localized document name.
+        #/// </summary>
+        #/// <returns>
+        #///    The label corresponding to the localized document name.
+        #/// </returns>
+        #public LabelDescription getLabel()
+        #{
+        #    return "@SYS77806";
+        #}
+        #
+      ENDSOURCE
+      SOURCE #initMandatoryFieldsMap
+        #/// <summary>
+        #///    Creates a list of mandatory fields for this document
+        #/// </summary>
+        #protected void initMandatoryFieldsMap()
+        #{
+        #    super();
+        #    this.setParmMethodAsMandatory(classnum(AxWMSOrderTrans), methodstr(AxWMSOrderTrans, parmInventTransId)) ;
+        #    this.setTableFieldAsMandatory(tablenum(InventDim), fieldstr(InventDim, InventDimId));
+        #}
+      ENDSOURCE
+      SOURCE #new
+        #/// <summary>
+        #///    Initializes a new instance of the <c>AxdPickingList</c> class.
+        #/// </summary>
+        #public void new()
+        #{
+        #    super();
+        #    aifConstraintList = new AifConstraintList();
+        #}
+      ENDSOURCE
+      SOURCE #PickingListRegistration
+        #public boolean PickingListRegistration(str SalesId, real  Qty )
+        #{
+        #SalesFormLetter salesFormLetter;
+        #QueryRun queryRun;
+        #Query query1;
+        #str strSalesTable = "V683904, V683905, V683906";
+        # SalesTable      salesTable = salesTable::find(SalesId,true);
+        #;
+        #salesFormLetter = SalesFormLetter::construct(DocumentStatus::PickingList);
+        #query1 = new Query(QueryStr(SalesUpdate));
+        #query1.dataSourceTable(tablenum(SalesTable)).addRange(fieldnum(SalesTable, SalesId)).value(SalesId);
+        #queryRun = new QueryRun(query1);
+        #
+        #salesFormLetter.chooseLinesQuery(queryRun);
+        #salesFormLetter.transDate(systemdateget());
+        #
+        #salesFormLetter.specQty(SalesUpdate::PickingList)   ;
+        #
+        #salesFormLetter.printFormLetter(false);
+        #
+        #salesFormLetter.update(SalesTable,systemdateget(), Qty,AccountOrder::None, NoYes::No, NoYes::No);
+        #
+        #salesFormLetter.createParmUpdate();
+        #salesFormLetter.chooseLines(null,true);
+        #salesFormLetter.reArrangeNow(true);
+        #salesFormLetter.run();
+        #
+        #
+        #return true;
+        #}
+      ENDSOURCE
+      SOURCE #processingRecord
+        #/// <summary>
+        #///    preparing constraint(s) for the particular record.
+        #/// </summary>
+        #/// <param name="common">
+        #///    The table from which the constraint(s) should be found.
+        #/// </param>
+        #public void processingRecord(Common common)
+        #{
+        #    AifConstraint   aifConstraint  ;
+        #    InventDim       inventDim ;
+        #    ;
+        #
+        #    if (common.TableId == tablenum(InventDim))
+        #    {
+        #        inventDim = common ;
+        #        aifConstraint = new AifConstraint();
+        #        if (inventDim.InventLocationId)
+        #        {
+        #            aifConstraint.parmType(AifConstraintType::Warehouse) ;
+        #            aifConstraint.parmId(inventDim.InventLocationId) ;
+        #        }
+        #        else
+        #        {
+        #            aifConstraint.parmType(AifConstraintType::NotSet) ;
+        #        }
+        #
+        #        aifConstraintList.addConstraint(aifConstraint) ;
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #registerPickingList
+        #public boolean registerPickingList(str SalesOrderId)
+        #{
+        #SalesFormLetter salesFormLetter;
+        #QueryRun queryRun;
+        #Query query1;
+        #str strSalesTable = "V683904, V683905, V683906";
+        #;
+        #salesFormLetter = SalesFormLetter::construct(DocumentStatus::PackingSlip);
+        #query1 = new Query(QueryStr(SalesUpdate));
+        #query1.dataSourceTable(tablenum(SalesTable)).addRange(fieldnum(SalesTable, SalesId)).value(SalesOrderId);
+        #queryRun = new QueryRun(query1);
+        #
+        #salesFormLetter.chooseLinesQuery(queryRun);
+        #salesFormLetter.transDate(systemdateget());
+        #salesFormLetter.specQty(SalesUpdate::All);
+        #salesFormLetter.printFormLetter(false);
+        #
+        #salesFormLetter.createParmUpdate();
+        #salesFormLetter.chooseLines(null,true);
+        #salesFormLetter.reArrangeNow(true);
+        #salesFormLetter.run();
+        #return true;
+        #}
+      ENDSOURCE
+      SOURCE #RegisterPickingList2
+        #void RegisterPickingList2(str 50 routeid, str 50 itemid, Real quantity)
+        #{
+        #WMSOrderTrans myTable;
+        #
+        #while select forupdate myTable
+        #  where myTable.itemId == itemid && myTable.routeId == routeid
+        #
+        #{
+        # if (myTable)
+        # {
+        #  ttsbegin;
+        #  myTable.qty = Quantity;
+        #  ttscommit;
+        #  }
+        #}
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        #}
+      ENDSOURCE
+      SOURCE #update
+        #/// <summary>
+        #///    Update that identify posted transactions and update in the database.
+        #/// </summary>
+        #/// <param name="_entityKey">
+        #///    An entity key that identifies the transaction to be update.
+        #/// </param>
+        #/// <param name="_xml">
+        #///    An XML string that contains the data (transaction) to persist to the database.
+        #/// </param>
+        #/// <param name="_actionPolicyInfo">
+        #///    An instance of the <see cref="AifEndpointActionPolicyInfo Class" />, to specify the value mapping to perform. This class can be empty if no value mapping is to occur.
+        #/// </param>
+        #/// <param name="_constraintList">
+        #///    A list that contains the constraints that are identified in the document.
+        #///    The <paramref name="_constraintList" /> parameter must be an instantiated, empty <see cref="AifConstraintList Class" />. It
+        #///    will be populated when the <c>update</c> method is run.
+        #/// </param>
+        #/// <returns>
+        #///    An XML string that contains the data of the transaction.
+        #/// </returns>
+        #/// <remarks>
+        #///    The <c>update</c> method is implemented on the <see cref="AxdBase Class" />. If a document does not provide the corresponding action type (ReceiveDocument), the <c>update</c> method must be overridden on
+        #///    the document class for the <c>update</c> method to throw an error if called.
+        #/// </remarks>
+        #public AifEntityKey update(AifEntityKey                _entityKey,
+        #                           AifDocumentXml              _xml,
+        #                           AifEndpointActionPolicyInfo _actionPolicyInfo,
+        #                           AifConstraintList           _constraintList)
+        #{
+        #    throw error(strfmt("@SYS94924", this.getName(), "@SYS98424"));
+        #}
+        #
+      ENDSOURCE
+      SOURCE #updateList
+        #/// <summary>
+        #///    UpdateList that identify posted transactions and update in the database.
+        #/// </summary>
+        #/// <param name="_entityKeyList">
+        #///    A list of entity keys that identify the transactions to be update.
+        #/// </param>
+        #/// <param name="_xml">
+        #///    An XML string that contains the data (transaction) to persist to the database.
+        #/// </param>
+        #/// <param name="_actionPolicyInfo">
+        #///    An instance of the <see cref="AifEndpointActionPolicyInfo Class" />, to specify the value mapping to perform. This class can be empty if no value mapping is to occur.
+        #/// </param>
+        #/// <param name="_constraintListcollection">
+        #///    A collection of lists that contain the constraints that are identified for each document.
+        #///    The <paramref name="_constraintListCollection" /> parameter must be an instantiated, empty <see
+        #///    cref="AifConstraintListCollection Class" />. It will be populated when the <c>updateList</c> method is run.
+        #/// </param>
+        #/// <returns>
+        #///    An XML string that contains the data of the transaction.
+        #/// </returns>
+        #/// <remarks>
+        #///    The <c>updateList</c> method is implemented on the <see cref="AxdBase Class" />. If a document does not provide the corresponding action type (ReceiveDocument), the <c>updateList</c> method must be overridden on
+        #///    the document class for the <c>updateList</c> method to throw an error if called.
+        #/// </remarks>
+        #public AifEntityKey updateList(AifEntityKeyList            _entityKeyList,
+        #                               AifDocumentXml              _xml,
+        #                               AifEndpointActionPolicyInfo _actionPolicyInfo,
+        #                               AifConstraintListCollection _constraintListcollection)
+        #{
+        #    throw error(strfmt("@SYS94924", this.getName(), "@SYS105883"));
+        #}
+        #
+      ENDSOURCE
+      SOURCE #updateNow
+        #public void updateNow()
+        #{
+        #    super();
+        #}
+      ENDSOURCE
+      SOURCE #CubesPrepPicking
+        #static void CubesPrepPicking(str 20 ItemID, str 20 RouteID, real qty) //Args _args
+        #{
+        #
+        # //'10000001'
+        # //str 20 ItemID;
+        # str 20 ItemID2;
+        # WMSOrderTrans WOTTable;
+        #
+        #while select forupdate WOTTable
+        # where WOTTable.itemId == ItemID && WOTTable.routeId == RouteID// 'IRT473999'
+        #
+        #{
+        # if (WOTTable)
+        # {
+        # ttsbegin;
+        # //WOTTable.itemId = '10000001' ;
+        #  //WOTTable.routeId = RouteID;
+        #  WOTTable.qty = qty;
+        # // WOTTable.expeditionStatus = 10;
+        # // WOTTAble.expeditionStatus = WMSExpeditionStatus::Complete;
+        #  //WOTTable.Insert();
+        # ttscommit;
+        #  }
+        #
+        #}
+        #
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END
