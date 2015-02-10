@@ -1,0 +1,191 @@
+str 50 CubesRegisterPickingListValidationV2(str 20 SalesID,str 20 ItemID, str 20 RouteID, real qty, str 20 ORDERID)
+{
+
+//
+   boolean retval = true;
+   List list = new List(Types::String);
+  WMSOrderTrans WOTTable;
+  WMSOrder WOTable;
+    WMSPickingRoute localWMSPickingRoute;
+    RouteTable RT;
+    SalesLine SL;
+    InventTrans IT;
+    SalesParmLine SPL;
+    //str 20 RouteID;
+   // str 20 ItemID;
+    real Quantity;
+    str s1;
+    str sqty;
+    str rqty;
+    real resQuantity;
+    str returnmsg;
+SalesFormLetter letter;
+SalesTable sale;
+ SalesParmLine parmLine;
+;
+
+
+try
+{
+
+letter=SalesFormLetter::construct(DocumentStatus::Invoice);
+sale = SalesTable::find(SalesID);
+
+ ttsBegin;
+   letter.update(sale, systemDateGet(), SalesUpdate::PickingList, AccountOrder::None, true, true);
+   ttsCommit;
+
+
+
+   ttsBegin;
+   letter.salesTable(sale);
+   letter.transDate          (systemDateGet());
+   letter.specQty            (SalesUpdate::PickingList);
+   letter.proforma           (true);
+   letter.printFormLetter    (true);
+
+
+      letter.createParmUpdate();
+
+   letter.initParameters(letter.salesParmUpdate(),
+                       PrintOut::Current);  // Printout
+
+   info(letter.parmId());
+   letter.giroType(sale.giroType);
+   letter.initLinesQuery();
+   while select forUpdate parmLine where parmLine.ParmId == letter.parmId()
+   {
+       // changed the Qty
+       parmLine.DeliverNow = qty;
+       // the following is stollen from the SalesEditLines form (field modified method)
+       parmLine.setQty(parmLine.salesParmTable().ordering, letter.SalesParmUpdate().creditRemaining);
+       parmLine.setInventDeliverNow();
+       parmLine.setLineAmount();
+
+       if (parmLine.closed)
+       {
+           parmLine.remainAfter = 0;
+           parmLine.setRemainAfterInvent();
+       }
+
+       parmLine.calcPackingUnitQty();
+
+       parmLine.update();
+   }
+
+   letter.run();
+
+   ttsCommit;
+
+///-------------
+
+
+
+
+
+
+
+while select forupdate SL where SL.ItemId == ItemID && SL.SalesId == SalesID
+{
+    ttsbegin;
+   SL.SalesDeliverNow = qty;
+    ttscommit;
+    returnmsg = "Deliver Now update to " + num2Str(Qty,0,4,1,3);
+
+
+}
+
+
+
+
+
+while select forupdate WOTTable
+ where WOTTable.itemId == ItemID && WOTTable.routeId == RouteID// 'IRT473999'
+
+{
+ if (WOTTable)
+ {
+ ttsbegin;
+
+
+  WOTTable.qty =   qty;
+
+ ttscommit;
+  returnmsg += " and WOTTABLE.qty = " + num2Str(Qty,0,4,1,3);
+ // returnmsg += " and WOTTABLE.qtyNoShipment = " + num2Str( WOTable.qtyNoShipment,0,4,1,3);
+
+  }
+  else
+  {
+  return "item does not exist";
+  }
+
+  // update the localWMStable
+  while select forupdate WOTable
+ where WOTable.itemId == ItemID && WOTable.inventTransId == WOTTable.inventTransId && WOTable.orderId == ORDERID// 'IRT473999'
+
+{
+
+ if (WOTable)
+ {
+ ttsbegin;
+ if (WOTable.qty < qty)
+ {
+
+  sqty = num2Str(Qty,0,4,1,3);
+  rqty = num2Str(WOTable.qty,0,4,1,3);
+ // WOTable.qtyRegistered(qty, );
+ return "Quantity out of range you requested " + sqty + " but only " + rqty + " exists";
+ }
+ else
+ {
+
+  //WOTable.qtyRequested = qty;
+
+  WOTable.qtyNoShipment = WOTable.qtyRequested - qty;
+  returnmsg+= "and WOTable.qtyRequested = " +num2Str(WOTable.qtyRequested,0,4,1,3);
+  returnmsg+= " and WOTable.qtyNoShipment = " +num2Str(WOTable.qtyNoShipment,0,4,1,3);
+ }
+ ttscommit;
+
+  }
+  else
+  {
+  return "item does not exist";
+  }
+
+
+
+
+
+  }
+
+
+
+    list.addEnd(RouteID);
+
+   // WMSPickingRoute::finishMulti(list.pack());//Note - this is not in a single tts, so some routes migh
+    //wmsDeliverPickedItems::checkDeliverPickedItems(localWMSPickingRoute.PickingRouteID,List.pack())
+     select firstonly localWMSPickingRoute where localWMSPickingRoute.pickingRouteID == ROUTEID;
+       // WMSOrderTransType::finishPickingLinesMulti(list.pack());
+   WMSOrderTransType::finishPickingLinesMulti(list.pack(),localWMSPickingRoute.CurrentPickPalletId,localWMSPickingRoute.Operator);
+
+    wmsDeliverPickedItems::checkDeliverPickedItems(ROUTEID,List.pack());
+
+}
+
+
+s1 = num2Str(Qty,0,4,1,3);
+return "Registration successfulQTY is  " + s1 + "  " + returnmsg;
+}
+catch (Exception::Error)
+{
+return"Error occured trying to register";
+}
+
+
+
+
+
+
+}
